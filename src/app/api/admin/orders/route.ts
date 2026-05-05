@@ -1,3 +1,7 @@
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { checkAndGenerateLoyaltyReward } from "../../../../lib/loyalty";
@@ -75,6 +79,14 @@ const updatedOrders = await prisma.deliveryOrder.findMany({
       if (reward) {
         generatedRewards.push(reward);
       }
+    }
+  }
+
+  for (const id of ids) {
+    try {
+      await editTelegramOrderMessage(id);
+    } catch (telegramError) {
+      console.error("Telegram message edit failed:", telegramError);
     }
   }
 
