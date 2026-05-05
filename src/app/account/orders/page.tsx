@@ -1,3 +1,6 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../../../lib/auth";
