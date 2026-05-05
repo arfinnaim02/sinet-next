@@ -6,7 +6,6 @@ import { prisma } from "../../../../lib/prisma";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
-export const runtime = "nodejs";
 
 const uploadDir = path.join(process.cwd(), "public", "uploaded-menu-items");
 
