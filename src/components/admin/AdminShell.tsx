@@ -14,7 +14,6 @@ const navGroups = [
     items: [
       { label: "Hero Banners", href: "/admin/banners" },
       { label: "Reviews", href: "/admin/reviews" },
-      { label: "Popups", href: "/admin/popups" },
     ],
   },
   {
@@ -30,10 +29,10 @@ const navGroups = [
     title: "Orders",
     items: [
       { label: "Delivery Orders", href: "/admin/orders" },
+      { label: "Customers", href: "/admin/customers" },
       { label: "Reservations", href: "/admin/reservations" },
       { label: "Coupons", href: "/admin/coupons" },
       { label: "Loyalty Rewards", href: "/admin/loyalty" },
-      { label: "Promotions", href: "/admin/promotions" },
       { label: "Delivery Pricing", href: "/admin/delivery-pricing" },
     ],
   },
@@ -41,8 +40,6 @@ const navGroups = [
     title: "System",
     items: [
       { label: "Contact Messages", href: "/admin/messages" },
-      { label: "Telegram Logs", href: "/admin/telegram-logs" },
-      { label: "Settings", href: "/admin/settings" },
     ],
   },
 ];
