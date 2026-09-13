@@ -22,7 +22,7 @@ export const fi = {
 // Footer 
 // ==============================
   footerAddress:
-  "Kauppakatu 28, ISO MYY 2. kerros, Tapio-elokuvakeskusta vastapäätä, Joensuu, 80100.",
+  "Kauppatori 2, Huone nro 1, 80100 Joensuu",
     footerGiveReview: "Anna arvostelu",
     footerOpeningTimes: "Aukioloajat",
     footerContact: "Yhteystiedot",
@@ -100,12 +100,12 @@ contactError: "Viestin lähetys epäonnistui.",
 // Home 
 // ==============================
 
-homeFreshTitle: "Tuoreet raaka-aineet",
-homeFreshText: "Paikallisesti hankittuja tuotteita",
-homeOpenTitle: "Avoinna joka päivä ma–su 10:00–22:00",
-homeOpenText: "Tervetuloa joka päivä.",
-homeDoughTitle: "Käsintehty taikina",
-homeDoughText: "Pizzataikina tehdään itse",
+homeFreshTitle: "Tuoreena valmistettu",
+homeFreshText: "Valmistetaan tuoreena jokaiseen tilaukseen",
+homeOpenTitle: "Avoinna myöhään pe–la",
+homeOpenText: "Palvelemme klo 02:00 asti",
+homeDoughTitle: "Jokaiselle jotakin",
+homeDoughText: "Pizzaa, kebabia, burgereita ja paljon muuta",
 homeFindUs: "Löydä meidät",
 homeVisitTitle: "Vieraile Ravintola Sinetissä",
 getDirections: "Hanki ajo-ohjeet",

@@ -162,7 +162,7 @@ export default function AboutPage() {
         <div>
           <p className="font-black text-white">{t("address")}</p>
           <p className="text-white/70">
-            Kauppakatu 28, Joensuu, Finland
+            Kauppatori 2, Room no. 1, 80100 Joensuu
           </p>
         </div>
 

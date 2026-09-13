@@ -35,15 +35,15 @@ export default function ContactForm() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to send message.");
+        throw new Error(data.message || t("contactError"));
       }
 
       setSuccess(true);
-      setStatus("Message sent successfully.");
+      setStatus(t("contactSuccess"));
       form.reset();
     } catch (error: any) {
       setSuccess(false);
-      setStatus(error?.message || "Failed to send message.");
+      setStatus(error?.message || t("contactError"));
     } finally {
       setLoading(false);
     }
@@ -62,14 +62,14 @@ export default function ContactForm() {
         name="email"
         type="email"
         required
-        placeholder="Your Email"
+        placeholder={t("contactEmailPlaceholder")}
         className="w-full rounded-xl border border-[#d8c9ac] bg-white px-4 py-3 text-sm outline-none focus:border-[#c9a45c]"
       />
 
       <textarea
         name="message"
         required
-        placeholder="Your Message"
+        placeholder={t("contactMessagePlaceholder")}
         className="min-h-[120px] w-full rounded-xl border border-[#d8c9ac] bg-white px-4 py-3 text-sm outline-none focus:border-[#c9a45c]"
       />
 
@@ -90,7 +90,7 @@ export default function ContactForm() {
         disabled={loading}
         className="sinet-gold-button w-full disabled:opacity-60"
       >
-        {loading ? "Sending..." : "Send Message"}
+        {loading ? t("sending") : t("sendMessage")}
       </button>
     </form>
   );

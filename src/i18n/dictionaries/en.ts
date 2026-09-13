@@ -26,7 +26,7 @@ export const en = {
 
 
   footerAddress:
-  "Kauppakatu 28, ISO MYY 2nd Floor, Opposite of Tapio Cinema Center, Joensuu, 80100.",
+  "Kauppatori 2, Room no. 1, 80100 Joensuu",
     footerGiveReview: "Give a Review",
     footerOpeningTimes: "Opening Times",
     footerContact: "Contact",
@@ -104,12 +104,12 @@ contactError: "Failed to send message.",
 // ==============================
 // HOME
 // ==============================
-homeFreshTitle: "Fresh Ingredients",
-homeFreshText: "Locally sourced produce",
-homeOpenTitle: "Open Daily Mon–Sun 10:00–22:00",
-homeOpenText: "Welcome every day.",
-homeDoughTitle: "Handcrafted Dough",
-homeDoughText: "Pizza dough made in-house",
+homeFreshTitle: "Freshly Prepared",
+homeFreshText: "Made fresh for every order",
+homeOpenTitle: "Open Late Fri–Sat",
+homeOpenText: "Serving until 02:00",
+homeDoughTitle: "Something for Everyone",
+homeDoughText: "Pizza, kebab, burgers & more",
 homeFindUs: "Find Us",
 homeVisitTitle: "Visit Ravintola Sinet",
 getDirections: "Get Directions",

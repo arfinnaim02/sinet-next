@@ -6,7 +6,7 @@ import HomeFavorites from "../components/HomeFavorites";
 import { useLanguage } from "../i18n/LanguageContext";
 export default function HomePage() {
   const { t } = useLanguage();
-  const mapQuery = "Ravintola Sinet, Kauppakatu 28, Joensuu, Finland";
+  const mapQuery = "Kauppatori 2, 80100 Joensuu, Finland";
 
   return (
     <div className="bg-[#f4eee4]">
@@ -25,7 +25,7 @@ export default function HomePage() {
             <h3 className="font-serif text-2xl font-semibold text-[#3b1f18]">
               {t("homeOpenTitle")}
             </h3>
-            <p className="mt-1 text-[#7b6255]">Welcome every day.</p>
+            <p className="mt-1 text-[#7b6255]">{t("homeOpenText")}</p>
           </div>
 
           <div className="text-center">
@@ -65,8 +65,7 @@ export default function HomePage() {
 
             <p className="mt-6 text-sm font-black text-[#3b1f18]">{t("address")}</p>
             <p className="mt-2 text-sm leading-6 text-[#7b6255]">
-              Kauppakatu 28, ISO MYY 2nd Floor, Opposite of Tapio Cinema Center,
-              Joensuu, 80100.
+              {t("footerAddress")}
             </p>
 
             <p className="mt-6 text-sm font-black text-[#3b1f18]">{t("phone")}</p>
@@ -78,7 +77,7 @@ export default function HomePage() {
             </a>
 
             <Link
-              href="https://maps.app.goo.gl/mzgvAhVgjo4j2fNb9"
+              href="https://maps.app.goo.gl/XD3sXf4yUTzfKXKp9"
               target="_blank"
               className="mt-8 inline-block rounded-full bg-[#c9a45c] px-6 py-3 text-sm font-black text-[#3b1f18] shadow-lg shadow-[#3b1f18]/10"
             >

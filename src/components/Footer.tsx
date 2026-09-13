@@ -114,8 +114,8 @@ export default function Footer() {
                 <span>{t("dayTue")}</span><span>10:00–22:00</span>
                 <span>{t("dayWed")}</span><span>10:00–22:00</span>
                 <span>{t("dayThu")}</span><span>10:00–22:00</span>
-                <span>{t("dayFri")}</span><span>10:00–22:00</span>
-                <span>{t("daySat")}</span><span>10:00–22:00</span>
+                <span>{t("dayFri")}</span><span>10:00–02:00</span>
+                <span>{t("daySat")}</span><span>10:00–02:00</span>
                 <span>{t("daySun")}</span><span>10:00–22:00</span>
             </div>
           </div>
