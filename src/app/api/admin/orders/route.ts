@@ -21,15 +21,30 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ success: true, orders });
+    const serializedOrders = orders.map((order) => ({
+      ...order,
+      telegramMessageId:
+        order.telegramMessageId !== null
+          ? order.telegramMessageId.toString()
+          : null,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      orders: serializedOrders,
+    });
   } catch (error: any) {
+    console.error("ADMIN ORDERS GET ERROR:", error);
+
     return NextResponse.json(
-      { success: false, message: error?.message || "Failed to load orders." },
+      {
+        success: false,
+        message: error?.message || "Failed to load orders.",
+      },
       { status: 500 }
     );
   }
 }
-
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();

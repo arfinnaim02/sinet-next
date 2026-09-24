@@ -128,9 +128,14 @@ export default function Footer() {
             </a>
 
             <div className="mt-6 space-y-3">
-              <Link href="/menu" className="block rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold transition hover:border-[#d7b875] hover:text-[#d7b875]">
-                {t("footerOrderWolt")}
-              </Link>
+                <a
+                  href="https://wolt.com/en/fin/joensuu/restaurant/ravintola-sinet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold transition hover:border-[#d7b875] hover:text-[#d7b875]"
+                >
+                  {t("footerOrderWolt")}
+                </a>
 
               <Link href="/reservation" className="block rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold transition hover:border-[#d7b875] hover:text-[#d7b875]">
                 {t("footerReservation")}

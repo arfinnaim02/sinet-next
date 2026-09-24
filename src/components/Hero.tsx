@@ -106,17 +106,13 @@ export default function Hero() {
           {current.subtitle === "heroSubtitle" ? t("heroSubtitle") : current.subtitle || t("heroSubtitle")}
         </p>
 
-        <div className="mt-9 grid w-full max-w-[760px] grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-9 grid w-full max-w-[620px] grid-cols-1 gap-3 sm:grid-cols-2">
           <Link href="/reservation" className="sinet-gold-button">
             {t("makeReservation")}
           </Link>
 
-          <Link href="/menu" className="sinet-outline-button">
-            {t("viewMenu")}
-          </Link>
-
-          <Link href={current.buttonUrl || "/menu"} className="sinet-gold-button">
-            {current.buttonText === "orderOnline" ? t("orderOnline") : current.buttonText || t("orderOnline")}
+          <Link href="/menu" className="sinet-gold-button">
+            {t("orderOnline")}
           </Link>
         </div>
 
