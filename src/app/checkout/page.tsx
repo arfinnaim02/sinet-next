@@ -31,8 +31,14 @@ type AppliedCoupon = {
   discountType: string;
   discountValue: number;
   discount: number;
+  minimumSubtotal?: number;
 };
 
+type CouponStatus =
+  | "idle"
+  | "warning"
+  | "success"
+  | "error";
 export default function CheckoutPage() {
   const { t } = useLanguage();
   const { cart, totalPrice, clearCart } = useCart();
@@ -72,7 +78,11 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponMessage, setCouponMessage] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponStatus, setCouponStatus] =
+    useState<CouponStatus>("idle");
+
+  const [appliedCoupon, setAppliedCoupon] =
+    useState<AppliedCoupon | null>(null);
 
 
   const couponDiscount = appliedCoupon?.discount || 0;
@@ -90,6 +100,7 @@ export default function CheckoutPage() {
     setLocationMessage("");
     setAppliedCoupon(null);
     setCouponMessage("");
+    setCouponStatus("idle");
 
     try {
       const response = await fetch("/api/delivery/google-distance", {
@@ -150,6 +161,7 @@ if (extraInput) {
   setDeliveryConfirmed(false);
   setAppliedCoupon(null);
   setCouponMessage("");
+  setCouponStatus("idle");
 
   await calculateDeliveryFromLocation(
     address.addressLabel,
@@ -179,43 +191,13 @@ if (extraInput) {
   }
 
   async function applyCoupon() {
-    setCouponLoading(true);
-    setCouponMessage("");
-    setAppliedCoupon(null);
+  const code = couponCode.trim();
 
-    try {
-      const response = await fetch("/api/coupons/apply", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: couponCode,
-          subtotal: totalPrice,
-          deliveryFee,
-        }),
-      });
+  if (!code) return;
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || t("checkoutInvalidCoupon"));
-      }
-
-      setAppliedCoupon(data.coupon);
-      setCouponMessage(
-        `${t("checkoutClaimedCouponApplied")}: -€${Number(data.coupon.discount).toFixed(2)}`
-      );
-    } catch (error: any) {
-      setCouponMessage(error?.message || "Failed to apply coupon.");
-    } finally {
-      setCouponLoading(false);
-    }
-  }
-
-  async function applyClaimedCoupon(code: string) {
   setCouponLoading(true);
   setCouponMessage("");
+  setCouponStatus("idle");
   setAppliedCoupon(null);
 
   try {
@@ -234,21 +216,133 @@ if (extraInput) {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.message || "Invalid coupon.");
+      throw new Error(
+        data.message || t("checkoutInvalidCoupon")
+      );
     }
 
-    setCouponCode(code);
+    /*
+     * Coupon exists and is valid,
+     * but minimum order has not been reached.
+     */
+    if (data.eligible === false) {
+      setAppliedCoupon(null);
+
+      setCouponStatus("warning");
+
+      setCouponMessage(
+        data.message ||
+          `Add €${Number(
+            data.remainingAmount || 0
+          ).toFixed(2)} more to use this coupon.`
+      );
+
+      return;
+    }
+
     setAppliedCoupon(data.coupon);
-    setCouponMessage(
-      `Claimed coupon applied: -€${Number(data.coupon.discount).toFixed(2)}`
-    );
+    setCouponStatus("success");
+
+    if (data.coupon.discountType === "free_delivery") {
+      setCouponMessage("Free delivery unlocked!");
+    } else {
+      setCouponMessage(
+        `${t(
+          "checkoutCouponApplied"
+        )}: -€${Number(
+          data.coupon.discount
+        ).toFixed(2)}`
+      );
+    }
   } catch (error: any) {
-    setCouponMessage(error?.message || t("checkoutClaimedCouponFailed"));
+    setAppliedCoupon(null);
+    setCouponStatus("error");
+
+    setCouponMessage(
+      error?.message || t("checkoutCouponFailed")
+    );
   } finally {
     setCouponLoading(false);
   }
 }
 
+ async function applyClaimedCoupon(code: string) {
+  const normalizedCode = code.trim();
+
+  if (!normalizedCode) return;
+
+  setCouponLoading(true);
+  setCouponMessage("");
+  setCouponStatus("idle");
+  setAppliedCoupon(null);
+
+  try {
+    const response = await fetch("/api/coupons/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: normalizedCode,
+        subtotal: totalPrice,
+        deliveryFee,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || t("checkoutInvalidCoupon")
+      );
+    }
+
+    setCouponCode(normalizedCode);
+
+    /*
+     * Valid coupon, but cart is still below
+     * the coupon minimum.
+     */
+    if (data.eligible === false) {
+      setAppliedCoupon(null);
+      setCouponStatus("warning");
+
+      setCouponMessage(
+        data.message ||
+          `Add €${Number(
+            data.remainingAmount || 0
+          ).toFixed(2)} more to use this coupon.`
+      );
+
+      return;
+    }
+
+    setAppliedCoupon(data.coupon);
+    setCouponStatus("success");
+
+    if (data.coupon.discountType === "free_delivery") {
+      setCouponMessage("Free delivery unlocked!");
+    } else {
+      setCouponMessage(
+        `${t(
+          "checkoutClaimedCouponApplied"
+        )}: -€${Number(
+          data.coupon.discount
+        ).toFixed(2)}`
+      );
+    }
+  } catch (error: any) {
+    setAppliedCoupon(null);
+    setCouponStatus("error");
+
+    setCouponMessage(
+      error?.message ||
+        t("checkoutClaimedCouponFailed")
+    );
+  } finally {
+    setCouponLoading(false);
+  }
+}
   useEffect(() => {
     const claimedCode = localStorage.getItem("claimedCouponCode");
 
@@ -314,19 +408,32 @@ if (extraInput) {
     loadUser();
   }, []);
 
-  useEffect(() => {
-    const claimedCode = localStorage.getItem("claimedCouponCode");
+useEffect(() => {
+  if (!deliveryConfirmed || totalPrice <= 0) {
+    return;
+  }
 
-    if (
-      claimedCode &&
-      deliveryConfirmed &&
-      totalPrice > 0 &&
-      !appliedCoupon &&
-      !couponLoading
-    ) {
-      applyClaimedCoupon(claimedCode);
-    }
-  }, [deliveryConfirmed, totalPrice]);
+  const claimedCode =
+    localStorage.getItem("claimedCouponCode");
+
+  const codeToCheck =
+    appliedCoupon?.code ||
+    claimedCode ||
+    couponCode.trim();
+
+  if (!codeToCheck) {
+    return;
+  }
+
+  const timer = window.setTimeout(() => {
+    void applyClaimedCoupon(codeToCheck);
+  }, 250);
+
+  return () => {
+    window.clearTimeout(timer);
+  };
+}, [deliveryConfirmed, totalPrice, deliveryFee]);
+
   
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -601,6 +708,7 @@ if (extraInput) {
                   setCouponCode(event.target.value.toUpperCase());
                   setAppliedCoupon(null);
                   setCouponMessage("");
+                  setCouponStatus("idle");
                 }}
                 placeholder={t("checkoutCouponPlaceholder")}
                 className="min-w-0 flex-1 rounded-2xl border border-[#d8c9ac] bg-[#fffaf3] px-4 py-3 text-sm font-bold uppercase outline-none focus:border-[#c9a45c]"
@@ -617,17 +725,31 @@ if (extraInput) {
             </div>
 
             {couponMessage && (
-              <p
-                className={`mt-3 rounded-2xl px-4 py-3 text-sm font-bold ${
-                  appliedCoupon
-                    ? "border border-green-200 bg-green-50 text-green-700"
-                    : "border border-red-200 bg-red-50 text-red-700"
+              <div
+                className={`mt-3 rounded-2xl border px-4 py-3 ${
+                  couponStatus === "success"
+                    ? "border-green-200 bg-green-50 text-green-800"
+                    : couponStatus === "warning"
+                    ? "border-amber-300 bg-amber-50 text-amber-900"
+                    : couponStatus === "error"
+                    ? "border-red-200 bg-red-50 text-red-700"
+                    : "border-[#e0d3bf] bg-[#fffaf3] text-[#7b6255]"
                 }`}
               >
-                {couponMessage}
-              </p>
-            )}
+                <p className="text-sm font-black">
+                  {couponStatus === "warning" &&
+                    "Almost there — "}
+                  {couponMessage}
+                </p>
 
+                {couponStatus === "warning" && (
+                  <p className="mt-1 text-xs font-medium opacity-80">
+                    Add more items to your order and the coupon
+                    will activate automatically.
+                  </p>
+                )}
+              </div>
+            )}
             {appliedCoupon && (
               <button
                 type="button"
@@ -636,6 +758,7 @@ if (extraInput) {
                   setCouponCode("");
                   localStorage.removeItem("claimedCouponCode");
                   setCouponMessage("");
+                  setCouponStatus("idle");
                 }}
                 className="mt-3 text-sm font-black text-red-600 underline underline-offset-4"
               >
