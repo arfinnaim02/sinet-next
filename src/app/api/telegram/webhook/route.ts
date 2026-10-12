@@ -19,12 +19,41 @@ const allowedStatuses = [
   "cancelled",
 ];
 
+function getAllowedTelegramUserIds() {
+  return String(process.env.TELEGRAM_ALLOWED_USER_IDS || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function isAllowedTelegramUser(userId: number | string | undefined) {
+  if (!userId) return false;
+
+  return getAllowedTelegramUserIds().includes(String(userId));
+}
+
+function isAllowedTelegramChat(chatId: number | string | undefined) {
+  if (!chatId) return false;
+
+  const allowedChatId = String(
+    process.env.TELEGRAM_ADMIN_CHAT_ID || ""
+  ).trim();
+
+  return Boolean(allowedChatId) && String(chatId) === allowedChatId;
+}
+
 function isWebhookAuthorized(request: Request) {
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET || "";
 
-  if (!secret) return true;
+  if (!secret) {
+    console.error("TELEGRAM_WEBHOOK_SECRET is missing.");
+    return false;
+  }
 
-  const headerSecret = request.headers.get("x-telegram-bot-api-secret-token");
+  const headerSecret = request.headers.get(
+    "x-telegram-bot-api-secret-token"
+  );
+
   const url = new URL(request.url);
   const querySecret = url.searchParams.get("secret");
 
@@ -46,6 +75,27 @@ export async function POST(request: Request) {
     if (!callback?.data || !callback?.id) {
       return NextResponse.json({ success: true });
     }
+
+    const callbackUserId = callback.from?.id;
+const callbackChatId = callback.message?.chat?.id;
+
+if (!isAllowedTelegramChat(callbackChatId)) {
+  await answerTelegramCallback(
+    callback.id,
+    "This order cannot be updated from this chat."
+  );
+
+  return NextResponse.json({ success: true });
+}
+
+if (!isAllowedTelegramUser(callbackUserId)) {
+  await answerTelegramCallback(
+    callback.id,
+    "You are not authorized to update this order."
+  );
+
+  return NextResponse.json({ success: true });
+}
 
     const data = String(callback.data);
     const parts = data.split(":");
