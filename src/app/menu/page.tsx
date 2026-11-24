@@ -438,7 +438,7 @@ const totalItemsText =
       <button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#6b3c28] text-2xl text-white shadow-2xl shadow-[#3b1f18]/30 transition hover:bg-[#3b1f18]"
+        className="fixed bottom-24 right-5 z-40 flex h-12 w-12 md:bottom-6 items-center justify-center rounded-full bg-[#6b3c28] text-2xl text-white shadow-2xl shadow-[#3b1f18]/30 transition hover:bg-[#3b1f18]"
         aria-label={t("backToTop")}
       >
         ↑
