@@ -1,8 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../i18n/LanguageContext";
+
+type UpsellItem = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string | null;
+  category?: {
+    name: string;
+    slug: string;
+  } | null;
+};
+
+type DeliveryPromotion = {
+  title: string;
+  minSubtotal: number;
+  freeDelivery: boolean;
+};
 
 export default function CartDrawer() {
   const { t } = useLanguage();
@@ -11,11 +30,84 @@ export default function CartDrawer() {
     cart,
     isCartOpen,
     closeCart,
+    addItem,
     updateQuantity,
     removeItem,
     totalPrice,
     totalQuantity,
   } = useCart();
+
+  const [upsellItems, setUpsellItems] = useState<UpsellItem[]>([]);
+  const [deliveryPromotion, setDeliveryPromotion] =
+    useState<DeliveryPromotion | null>(null);
+
+  useEffect(() => {
+    if (!isCartOpen) return;
+
+    async function loadConversionData() {
+      try {
+        const [upsellResponse, promotionResponse] = await Promise.all([
+          fetch("/api/menu/upsells", { cache: "no-store" }),
+          fetch("/api/delivery/promotion", { cache: "no-store" }),
+        ]);
+
+        const [upsellData, promotionData] = await Promise.all([
+          upsellResponse.json(),
+          promotionResponse.json(),
+        ]);
+
+        if (upsellResponse.ok && upsellData.success) {
+          setUpsellItems(Array.isArray(upsellData.items) ? upsellData.items : []);
+        }
+
+        if (promotionResponse.ok && promotionData.success) {
+          setDeliveryPromotion(promotionData.promotion || null);
+        }
+      } catch {
+        setUpsellItems([]);
+        setDeliveryPromotion(null);
+      }
+    }
+
+    loadConversionData();
+  }, [isCartOpen]);
+
+  const availableUpsells = useMemo(() => {
+    const cartIds = new Set(cart.map((item) => item.id));
+
+    return upsellItems
+      .filter((item) => !cartIds.has(item.id))
+      .slice(0, 3);
+  }, [upsellItems, cart]);
+
+  const freeDeliveryMinimum = Number(
+    deliveryPromotion?.minSubtotal || 0
+  );
+
+  const freeDeliveryRemaining = Math.max(
+    0,
+    freeDeliveryMinimum - totalPrice
+  );
+
+  const freeDeliveryUnlocked =
+    Boolean(deliveryPromotion) &&
+    (freeDeliveryMinimum <= 0 || freeDeliveryRemaining <= 0);
+
+  const freeDeliveryProgress =
+    freeDeliveryMinimum > 0
+      ? Math.min(100, (totalPrice / freeDeliveryMinimum) * 100)
+      : 100;
+
+  function addUpsell(item: UpsellItem) {
+    addItem({
+      id: item.id,
+      name: item.name,
+      description: item.description || "",
+      price: Number(item.price || 0),
+      category: item.category?.slug || "",
+      image: item.image || "",
+    });
+  }
 
   if (!isCartOpen) return null;
 
@@ -123,7 +215,7 @@ export default function CartDrawer() {
                             <div className="space-y-1">
                               {item.addons.map((addon) => (
                                 <div
-                                  key={`${identifier}-${addon.optionId}`}
+                                  key={\`\${identifier}-\${addon.optionId}\`}
                                   className="flex justify-between gap-3 text-xs text-[#7b6255]"
                                 >
                                   <span>
@@ -182,9 +274,104 @@ export default function CartDrawer() {
                   </article>
                 );
               })}
+
+              {availableUpsells.length > 0 && (
+                <section className="rounded-2xl border border-[#ddcfba] bg-[#2a1510] p-4 text-white shadow-lg">
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#d7b875]">
+                      {t("cartCompleteOrderEyebrow")}
+                    </p>
+                    <h3 className="mt-1 font-display text-xl font-black">
+                      {t("cartCompleteOrder")}
+                    </h3>
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    {availableUpsells.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.07] p-2.5"
+                      >
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/10">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center font-script text-xl text-[#d7b875]">
+                              S
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-black">
+                            {item.name}
+                          </p>
+                          <p className="mt-0.5 text-xs font-bold text-white/60">
+                            €{Number(item.price || 0).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => addUpsell(item)}
+                          className="shrink-0 rounded-full bg-[#c9a45c] px-3 py-2 text-xs font-black text-[#3b1f18] transition hover:bg-[#d7b875]"
+                        >
+                          + {t("quickAdd")}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             <div className="border-t border-[#ddcfba] bg-white px-5 py-5">
+              {deliveryPromotion && (
+                <div className="mb-4 rounded-2xl border border-[#eadfce] bg-[#fffaf3] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-[#b09876]">
+                        {deliveryPromotion.title || t("freeDelivery")}
+                      </p>
+                      <p
+                        className={\`mt-1 text-sm font-black \${
+                          freeDeliveryUnlocked
+                            ? "text-green-700"
+                            : "text-[#3b1f18]"
+                        }\`}
+                      >
+                        {freeDeliveryUnlocked
+                          ? t("freeDeliveryUnlocked")
+                          : \`€\${freeDeliveryRemaining.toFixed(2)} \${t(
+                              "freeDeliveryRemaining"
+                            )}\`}
+                      </p>
+                    </div>
+
+                    {freeDeliveryUnlocked && (
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-lg text-green-700">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#eadfce]">
+                    <div
+                      className={\`h-full rounded-full transition-all duration-500 \${
+                        freeDeliveryUnlocked
+                          ? "bg-green-600"
+                          : "bg-[#c9a45c]"
+                      }\`}
+                      style={{ width: \`\${freeDeliveryProgress}%\` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-sm font-black uppercase tracking-[0.25em] text-[#9c806b]">
                   {totalQuantity} {totalQuantity === 1 ? t("item") : t("items")}
