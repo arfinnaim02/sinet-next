@@ -5,6 +5,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
+import OrderAgainButton from "../../../components/account/OrderAgainButton";
 
 function money(value: any) {
   return `€${Number(value || 0).toFixed(2)}`;
@@ -225,6 +226,8 @@ export default async function AccountOrdersPage() {
                         <span>{money(order.total)}</span>
                       </div>
                     </div>
+
+                    <OrderAgainButton orderId={order.id} />
                   </aside>
                 </div>
               </article>

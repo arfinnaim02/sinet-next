@@ -97,7 +97,7 @@ export default function Footer() {
                 <InstagramIcon />
               </a>
 
-              <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-[#d7b875] hover:text-[#3b1f18]">
+              <a href="https://www.facebook.com/SinetJoensuu" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-[#d7b875] hover:text-[#3b1f18]">
                 <FacebookIcon />
               </a>
 
