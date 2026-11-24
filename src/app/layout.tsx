@@ -25,7 +25,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Ravintola Sinet – Pizza, Kebab & Food Delivery in Joensuu",
   description:
-    "Ravintola Sinet in Joensuu. Order pizza, kebab, burgers and fresh dishes online. Located at Kauppakatu 28, Joensuu, Finland.",
+    "Ravintola Sinet in Joensuu. Order pizza, kebab, burgers and fresh dishes online. Located at Kauppatori 2, Room no. 1, 80100 Joensuu, Finland.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
