@@ -86,7 +86,7 @@ export async function POST(
       const menuItem = orderItem.menuItem;
 
       if (!menuItem || menuItem.status !== "active") {
-        warnings.push(\`\${orderItem.name} is no longer available.\`);
+        warnings.push(`${orderItem.name} is no longer available.`);
         continue;
       }
 
@@ -118,7 +118,7 @@ export async function POST(
 
         if (matchedOptions.length < requiredCount) {
           warnings.push(
-            \`\${menuItem.name} needs to be customized again before ordering.\`
+            `${menuItem.name} needs to be customized again before ordering.`
           );
           canRestore = false;
           break;
@@ -131,7 +131,7 @@ export async function POST(
             optionId: option.id,
             optionName:
               index < rules.freeChoicesCount
-                ? \`\${option.name} (Free)\`
+                ? `${option.name} (Free)`
                 : option.name,
             optionPrice:
               index < rules.freeChoicesCount ? 0 : Number(option.price || 0),
