@@ -4,35 +4,33 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 
-function isWithinWindow(
-  startAt: Date | null,
-  endAt: Date | null,
-  now: Date
-) {
-  const validStart = !startAt || startAt <= now;
-  const validEnd = !endAt || endAt >= now;
-
-  return validStart && validEnd;
-}
-
 export async function GET() {
   try {
     const now = new Date();
 
-    const promotions = await prisma.deliveryPromotion.findMany({
+    const promotion = await prisma.deliveryPromotion.findFirst({
       where: {
         isActive: true,
         freeDelivery: true,
+        AND: [
+          {
+            OR: [
+              { startAt: null },
+              { startAt: { lte: now } },
+            ],
+          },
+          {
+            OR: [
+              { endAt: null },
+              { endAt: { gte: now } },
+            ],
+          },
+        ],
       },
       orderBy: {
         createdAt: "desc",
       },
-      take: 20,
     });
-
-    const promotion = promotions.find((item) =>
-      isWithinWindow(item.startAt, item.endAt, now)
-    );
 
     if (promotion) {
       return NextResponse.json({
@@ -51,25 +49,31 @@ export async function GET() {
       where: {
         isActive: true,
         discountType: "free_delivery",
+        AND: [
+          {
+            OR: [
+              { startAt: null },
+              { startAt: { lte: now } },
+            ],
+          },
+          {
+            OR: [
+              { endAt: null },
+              { endAt: { gte: now } },
+            ],
+          },
+        ],
       },
       orderBy: [
-        {
-          isFeatured: "desc",
-        },
-        {
-          createdAt: "desc",
-        },
+        { isFeatured: "desc" },
+        { createdAt: "desc" },
       ],
       take: 20,
     });
 
-    const coupon = coupons.find((item) => {
-      const validWindow = isWithinWindow(item.startAt, item.endAt, now);
-      const validUses =
-        item.maxUses === null || item.usedCount < item.maxUses;
-
-      return validWindow && validUses;
-    });
+    const coupon = coupons.find(
+      (item) => item.maxUses === null || item.usedCount < item.maxUses
+    );
 
     if (coupon) {
       return NextResponse.json({
@@ -92,8 +96,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: false,
-        message:
-          error?.message || "Failed to load delivery promotion.",
+        message: error?.message || "Failed to load delivery promotion.",
       },
       { status: 500 }
     );
