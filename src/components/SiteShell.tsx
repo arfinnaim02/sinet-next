@@ -5,6 +5,7 @@ import { CartProvider } from "../contexts/CartContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import CartDrawer from "./CartDrawer";
+import MobileOrderBar from "./MobileOrderBar";
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="flex-grow">{children}</main>
       <Footer />
+      <MobileOrderBar />
       <CartDrawer />
     </CartProvider>
   );
