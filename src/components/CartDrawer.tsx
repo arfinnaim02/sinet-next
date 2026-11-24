@@ -21,6 +21,8 @@ type DeliveryPromotion = {
   title: string;
   minSubtotal: number;
   freeDelivery: boolean;
+  requiresCode: boolean;
+  code: string;
 };
 
 export default function CartDrawer() {
@@ -40,9 +42,13 @@ export default function CartDrawer() {
   const [upsellItems, setUpsellItems] = useState<UpsellItem[]>([]);
   const [deliveryPromotion, setDeliveryPromotion] =
     useState<DeliveryPromotion | null>(null);
+  const [claimedDeliveryCode, setClaimedDeliveryCode] = useState("");
 
   useEffect(() => {
     if (!isCartOpen) return;
+
+    const storedCode = localStorage.getItem("claimedCouponCode") || "";
+    setClaimedDeliveryCode(storedCode);
 
     async function loadConversionData() {
       try {
@@ -97,6 +103,13 @@ export default function CartDrawer() {
     freeDeliveryMinimum > 0
       ? Math.min(100, (totalPrice / freeDeliveryMinimum) * 100)
       : 100;
+
+  function activateDeliveryCoupon() {
+    if (!deliveryPromotion?.requiresCode || !deliveryPromotion.code) return;
+
+    localStorage.setItem("claimedCouponCode", deliveryPromotion.code);
+    setClaimedDeliveryCode(deliveryPromotion.code);
+  }
 
   function addUpsell(item: UpsellItem) {
     addItem({
@@ -345,7 +358,9 @@ export default function CartDrawer() {
                         }`}
                       >
                         {freeDeliveryUnlocked
-                          ? t("freeDeliveryUnlocked")
+                          ? deliveryPromotion.requiresCode
+                            ? `${t("freeDeliveryEligible")} ${deliveryPromotion.code}`
+                            : t("freeDeliveryUnlocked")
                           : `€${freeDeliveryRemaining.toFixed(2)} ${t(
                               "freeDeliveryRemaining"
                             )}`}
@@ -369,6 +384,23 @@ export default function CartDrawer() {
                       style={{ width: `${freeDeliveryProgress}%` }}
                     />
                   </div>
+
+                  {freeDeliveryUnlocked &&
+                    deliveryPromotion.requiresCode &&
+                    deliveryPromotion.code && (
+                      <button
+                        type="button"
+                        onClick={activateDeliveryCoupon}
+                        disabled={
+                          claimedDeliveryCode === deliveryPromotion.code
+                        }
+                        className="mt-3 w-full rounded-xl bg-[#3b1f18] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#c9a45c] hover:text-[#3b1f18] disabled:bg-green-100 disabled:text-green-700"
+                      >
+                        {claimedDeliveryCode === deliveryPromotion.code
+                          ? t("offerActivated")
+                          : `${t("activateOffer")} ${deliveryPromotion.code}`}
+                      </button>
+                    )}
                 </div>
               )}
 
