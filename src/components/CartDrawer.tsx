@@ -215,7 +215,7 @@ export default function CartDrawer() {
                             <div className="space-y-1">
                               {item.addons.map((addon) => (
                                 <div
-                                  key={\`\${identifier}-\${addon.optionId}\`}
+                                  key={`${identifier}-${addon.optionId}`}
                                   className="flex justify-between gap-3 text-xs text-[#7b6255]"
                                 >
                                   <span>
@@ -338,17 +338,17 @@ export default function CartDrawer() {
                         {deliveryPromotion.title || t("freeDelivery")}
                       </p>
                       <p
-                        className={\`mt-1 text-sm font-black \${
+                        className={`mt-1 text-sm font-black ${
                           freeDeliveryUnlocked
                             ? "text-green-700"
                             : "text-[#3b1f18]"
-                        }\`}
+                        }`}
                       >
                         {freeDeliveryUnlocked
                           ? t("freeDeliveryUnlocked")
-                          : \`€\${freeDeliveryRemaining.toFixed(2)} \${t(
+                          : `€${freeDeliveryRemaining.toFixed(2)} ${t(
                               "freeDeliveryRemaining"
-                            )}\`}
+                            )}`}
                       </p>
                     </div>
 
@@ -361,12 +361,12 @@ export default function CartDrawer() {
 
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#eadfce]">
                     <div
-                      className={\`h-full rounded-full transition-all duration-500 \${
+                      className={`h-full rounded-full transition-all duration-500 ${
                         freeDeliveryUnlocked
                           ? "bg-green-600"
                           : "bg-[#c9a45c]"
-                      }\`}
-                      style={{ width: \`\${freeDeliveryProgress}%\` }}
+                      }`}
+                      style={{ width: `${freeDeliveryProgress}%` }}
                     />
                   </div>
                 </div>
