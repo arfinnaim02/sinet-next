@@ -30,7 +30,7 @@ export default function OrderAgainButton({
 
     try {
       const response = await fetch(
-        \`/api/account/orders/\${orderId}/reorder\`,
+        `/api/account/orders/${orderId}/reorder`,
         {
           method: "POST",
         }
