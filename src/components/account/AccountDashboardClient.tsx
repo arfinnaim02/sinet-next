@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import OrderAgainButton from "./OrderAgainButton";
 import { useLanguage } from "../../i18n/LanguageContext";
 
 type User = {
@@ -184,7 +185,7 @@ export default function AccountDashboardClient({
               </Link>
 
               <Link
-                href="/book"
+                href="/reservation"
                 className="rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white"
               >
                 {t("bookTable")}
@@ -407,6 +408,8 @@ export default function AccountDashboardClient({
                         {order.items.length === 1 ? t("item") : t("items")} ·{" "}
                         {order.addressLabel}
                       </p>
+
+                      <OrderAgainButton orderId={order.id} compact />
                     </article>
                   ))
                 )}
@@ -426,7 +429,7 @@ export default function AccountDashboardClient({
                 </div>
 
                 <Link
-                  href="/book"
+                  href="/reservation"
                   className="rounded-full bg-[#3b1f18] px-4 py-2 text-xs font-black text-white"
                 >
                   {t("bookTable")}
